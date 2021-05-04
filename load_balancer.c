@@ -7,7 +7,7 @@
 
 struct load_balancer {
 	server_memory **servers;
-    unsigned int *hash_ring;
+    long long *hash_ring;
 
     unsigned int num_servers;
     unsigned int num_hash_ring_servers;
@@ -35,24 +35,25 @@ unsigned int hash_function_key(void *a) {
 
 
 load_balancer* init_load_balancer() {
-	load_balancer *main = malloc(sizeof(load_balancer));
-    DIE(main == NULL,
+	load_balancer *new_main = malloc(sizeof(load_balancer));
+    DIE(new_main == NULL,
         "Unable to allocate memory for the main load balancer!\n");
 
-    main->servers = malloc(E_5 * sizeof(server_memory *));
-    DIE(main->servers == NULL, "Unable to allocate memory for the servers!\n");
+    new_main->servers = malloc(E_5 * sizeof(server_memory *));
+    DIE(new_main->servers == NULL,
+        "Unable to allocate memory for the servers!\n");
     for (unsigned int i = 0; i < E_5; i++) {
-        main->servers[i] = NULL;
+        new_main->servers[i] = NULL;
     }
 
-    main->hash_ring = malloc(E_5 * 3 * sizeof(unsigned int));
-    DIE(main->hash_ring == NULL,
+    new_main->hash_ring = calloc(E_5 * 3, sizeof(long long));
+    DIE(new_main->hash_ring == NULL,
         "Unable to allocate memory for the hash ring!\n");
 
-    main->num_servers = 0;
-    main->num_hash_ring_servers = 0;
+    new_main->num_servers = 0;
+    new_main->num_hash_ring_servers = 0;
 
-    return main;
+    return new_main;
 }
 
 void readjust_values_server1(unsigned int hash0, server_memory *server1,
@@ -73,7 +74,8 @@ void readjust_values_server1(unsigned int hash0, server_memory *server1,
             curr_value = malloc(sizeof(char) *
                                 (strlen((((struct info *)curr->data)->value))
                                 + 1));
-            
+            DIE(curr_value == NULL,
+                "Unable to allocate memory for the value name!\n");
             memcpy(curr_value, ((struct info *)curr->data)->value,
                    strlen(((struct info *)curr->data)->value) + 1);
 
@@ -115,7 +117,7 @@ void readjust_values_server2(server_memory *server1, server_memory *server2) {
 }
 
 void add_new_server(load_balancer *main, long long label) {
-    unsigned int pos_server0, pos_server1, pos_server2;
+    unsigned int pos_server1, pos_server2;
     unsigned int i;
 
     for (i = 0; i < main->num_hash_ring_servers; i++) {
@@ -124,31 +126,46 @@ void add_new_server(load_balancer *main, long long label) {
         }
     }
     pos_server1 = i;
-    server_memory *server1, *server2;
-    unsigned int server0_hash, server1_hash;
+    pos_server2 = (pos_server1 + 1) % main->num_hash_ring_servers;
+    server_memory *server2;
 
-    if (pos_server1 == 0) {
-        pos_server0 = main->num_hash_ring_servers - 1;
-    } else {
-        pos_server0 = pos_server1 - 1;
-    }
-
-    if (pos_server1 == main->num_hash_ring_servers - 1) {
-        pos_server2 = 0;
-    } else {
-        pos_server2 = pos_server1 + 1;
-    }
-
-    server0_hash = hash_function_servers(&main->hash_ring[pos_server0]);
-    server1_hash = hash_function_servers(&main->hash_ring[pos_server1]);
-
-    server1 = main->servers[main->hash_ring[pos_server1] % E_5];
     server2 = main->servers[main->hash_ring[pos_server2] % E_5];
 
     if (main->hash_ring[pos_server1] % E_5 !=
         main->hash_ring[pos_server2] % E_5) {
-        readjust_values_server1(server0_hash, server1, server1_hash, server2);
-        readjust_values_server2(server1, server2);
+        for (unsigned int i = 0; i < server2->ht->hmax; i++) {
+            ll_node_t *curr = server2->ht->buckets[i]->head;
+
+            while (curr != NULL) {
+                int new_server_id = -1;
+                char *curr_key;
+                curr_key = malloc(sizeof(char) *
+                                (strlen(((struct info *)curr->data)->key)) + 1);
+                DIE(curr_key == NULL,
+                    "Unable to allocate memory for the key name!\n");
+                memcpy(curr_key, ((struct info *)curr->data)->key,
+                    strlen(((struct info *)curr->data)->key) + 1);
+
+                char *curr_value;
+                curr_value = malloc(sizeof(char) *
+                                    (strlen(((struct info *)curr->data)->value))
+                                    + 1);
+                DIE(curr_value == NULL,
+                    "Unable to allocate memory for the value name!\n");
+                memcpy(curr_value, ((struct info *)curr->data)->value,
+                    strlen(((struct info *)curr->data)->value) + 1);
+                curr = curr->next;
+
+                loader_store(main, curr_key, curr_value, &new_server_id);
+
+                if (new_server_id != main->hash_ring[pos_server2] % E_5) {
+                    server_remove(server2, curr_key);
+                }
+
+                free(curr_key);
+                free(curr_value);
+            }
+        }
     }
 }
 
@@ -160,10 +177,27 @@ void delete_server(load_balancer *main, int server_id) {
 
         while (curr != NULL) {
             int new_server_id = -1;
-            loader_store(main, ((struct info *)curr->data)->key,
-                         ((struct info *)curr->data)->value, &new_server_id);
+            char *curr_key;
+            curr_key = malloc(sizeof(char) *
+                              (strlen(((struct info *)curr->data)->key)) + 1);
+            DIE(curr_key == NULL,
+                "Unable to allocate memory for the key name!\n");
+            memcpy(curr_key, ((struct info *)curr->data)->key,
+                   strlen(((struct info *)curr->data)->key) + 1);
+
+            char *curr_value;
+            curr_value = malloc(sizeof(char) *
+                              (strlen(((struct info *)curr->data)->value)) + 1);
+            DIE(curr_value == NULL,
+                "Unable to allocate memory for the value name!\n");
+            memcpy(curr_value, ((struct info *)curr->data)->value,
+                   strlen(((struct info *)curr->data)->value) + 1);
+
+            loader_store(main, curr_key, curr_value, &new_server_id);
 
             curr = curr->next;
+            free(curr_key);
+            free(curr_value);
         }
     }
 }
@@ -178,7 +212,11 @@ void loader_store(load_balancer* main, char* key, char* value, int* server_id) {
             break;
         }
     }
-    *server_id = main->hash_ring[i % main->num_hash_ring_servers] % E_5;
+    if (i == main->num_hash_ring_servers) {
+        i = 0;
+    }
+
+    *server_id = main->hash_ring[i] % E_5;
 
     // Placing the value in the found server and changing the server_id
     server_store(main->servers[*server_id], key, value);
@@ -235,6 +273,10 @@ void loader_add_server(load_balancer* main, int server_id) {
     for (unsigned int copy = 0; copy < 3; copy++) {
         long long label = E_5 * copy + server_id;
         hash_ring_add_server(main, label);
+    }
+
+    for (unsigned int copy = 0; copy < 3; copy++) {
+        long long label = E_5 * copy + server_id;
         add_new_server(main, label);
     }
 

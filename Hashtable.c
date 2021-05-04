@@ -48,6 +48,7 @@ hashtable_t *
 ht_create(unsigned int hmax, unsigned int (*hash_function)(void*),
 		int (*compare_function)(void*, void*))
 {
+	unsigned int i;
 	hashtable_t *ht = malloc(sizeof(hashtable_t));
 	DIE(ht == NULL, "Unable to allocate memory for the hashtable!\n");
 
@@ -60,7 +61,7 @@ ht_create(unsigned int hmax, unsigned int (*hash_function)(void*),
 	ht->hash_function = hash_function;
 
 	ht->hmax = hmax;
-	for (unsigned int i = 0; i < ht->hmax; i++) {
+	for (i = 0; i < ht->hmax; i++) {
 		ht->buckets[i] = ll_create(sizeof(struct info));
 	}
 
@@ -91,20 +92,20 @@ ht_put(hashtable_t *ht, void *key, unsigned int key_size,
 	if (curr == NULL) {
 		ht->size++;
 
-		struct info data;
-		data.key = malloc(key_size);
-		DIE(data.key == NULL,
+		struct info new_data;
+		new_data.key = malloc(key_size);
+		DIE(new_data.key == NULL,
 			"Unable to allocate memory for the new hashtable entry's key!\n");
 
-		memcpy(data.key, key, key_size);
+		memcpy(new_data.key, key, key_size);
 
-		data.value = malloc(value_size);
-		DIE(data.value == NULL,
+		new_data.value = malloc(value_size);
+		DIE(new_data.value == NULL,
 			"Unable to allocate memory for the new hashtable entry's value!\n");
 
-		memcpy(data.value, value, value_size);
+		memcpy(new_data.value, value, value_size);
 
-		ll_add_nth_node(ht->buckets[poz], ht->buckets[poz]->size, &data);
+		ll_add_nth_node(ht->buckets[poz], ht->buckets[poz]->size, &new_data);
 	} else {
 		memcpy(((struct info *)curr->data)->value, value, value_size);
 	}
@@ -179,19 +180,19 @@ ht_remove_entry(hashtable_t *ht, void *key)
 	unsigned int poz = (ht->hash_function(key)) % ht->hmax;
 
 	ll_node_t *curr = ht->buckets[poz]->head;
-	unsigned int entery_index = 0;
+	unsigned int entry_index = 0;
 
 	while (curr != NULL &&
 		   ht->compare_function(((struct info *)curr->data)->key, key) != 0) {
 		curr = curr->next;
-		entery_index++;
+		entry_index++;
 	}
 
 	if (curr == NULL) {
 		return;
 	}
 
-	curr = ll_remove_nth_node(ht->buckets[poz], entery_index);
+	curr = ll_remove_nth_node(ht->buckets[poz], entry_index);
 
 	free(((struct info *)curr->data)->value);
 	free(((struct info *)curr->data)->key);
@@ -206,14 +207,15 @@ for the hashtable, including all the value-key pairs.
 void
 ht_free(hashtable_t *ht)
 {
+	unsigned int i, j;
 	if (ht == NULL) {
 		printf("No list initialized!\n");
 		return;
 	}
 
-	for (unsigned int i = 0; i < ht->hmax; i++) {
+	for (i = 0; i < ht->hmax; i++) {
 		unsigned int initial_size = ht->buckets[i]->size;
-		for (unsigned int j = 0; j < initial_size; j++) {
+		for (j = 0; j < initial_size; j++) {
 			ll_node_t *curr = ll_remove_nth_node(ht->buckets[i], 0);
 
 			free(((struct info *)curr->data)->value);

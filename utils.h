@@ -1,6 +1,6 @@
 /* Copyright 2021 <Bivolaru Andra> */
-#ifndef LOAD_BALANCER_SKEL_UTILS_H_
-#define LOAD_BALANCER_SKEL_UTILS_H_
+#ifndef UTILS_H_
+#define UTILS_H_
 
 #include <errno.h>
 #include <stdio.h>
@@ -16,4 +16,4 @@
         }                                                                      \
     } while (0)
 
-#endif  // LOAD_BALANCER_SKEL_UTILS_H_
+#endif  // UTILS_H_

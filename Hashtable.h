@@ -1,6 +1,6 @@
 /* Copyright 2021 <Bivolaru Andra> */
-#ifndef LOAD_BALANCER_SKEL_HASHTABLE_H_
-#define LOAD_BALANCER_SKEL_HASHTABLE_H_
+#ifndef HASHTABLE_H_
+#define HASHTABLE_H_
 
 #include "LinkedList.h"
 
@@ -56,4 +56,4 @@ Hashing functions:
 unsigned int
 hash_function_string(void *a);
 
-#endif /* LOAD_BALANCER_SKEL_HASHTABLE_H_ */
+#endif /* HASHTABLE_H_ */

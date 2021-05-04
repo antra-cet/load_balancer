@@ -1,6 +1,6 @@
 /* Copyright 2021 <Bivolaru Andra> */
-#ifndef LOAD_BALANCER_SKEL_LOAD_BALANCER_H_
-#define LOAD_BALANCER_SKEL_LOAD_BALANCER_H_
+#ifndef LOAD_BALANCER_H_
+#define LOAD_BALANCER_H_
 
 #include "server.h"
 
@@ -75,4 +75,4 @@ void loader_add_server(load_balancer* main, int server_id);
 void loader_remove_server(load_balancer* main, int server_id);
 
 
-#endif  // LOAD_BALANCER_SKEL_LOAD_BALANCER_H_
+#endif  // LOAD_BALANCER_H_

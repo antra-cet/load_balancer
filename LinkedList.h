@@ -1,6 +1,6 @@
 /* Copyright 2021 <Bivolaru Andra> */
-#ifndef LOAD_BALANCER_SKEL_LINKEDLIST_H_
-#define LOAD_BALANCER_SKEL_LINKEDLIST_H_
+#ifndef LINKEDLIST_H_
+#define LINKEDLIST_H_
 
 typedef struct ll_node_t ll_node_t;
 struct ll_node_t
@@ -39,4 +39,4 @@ ll_print_int(linked_list_t* list);
 void
 ll_print_string(linked_list_t* list);
 
-#endif /* LOAD_BALANCER_SKEL_LINKEDLIST_H_ */
+#endif /* LINKEDLIST_H_ */

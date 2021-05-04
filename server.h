@@ -1,6 +1,6 @@
 /* Copyright 2021 <Bivolaru Andra> */
-#ifndef LOAD_BALANCER_SKEL_SERVER_H_
-#define LOAD_BALANCER_SKEL_SERVER_H_
+#ifndef SERVER_H_
+#define SERVER_H_
 
 #include "utils.h"
 #include "Hashtable.h"
@@ -44,4 +44,4 @@ void server_remove(server_memory* server, char* key);
  */
 char* server_retrieve(server_memory* server, char* key);
 
-#endif  // LOAD_BALANCER_SKEL_SERVER_H_
+#endif  // SERVER_H_
