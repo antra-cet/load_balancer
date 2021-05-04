@@ -1,0 +1,59 @@
+/* Copyright 2021 <Bivolaru Andra> */
+
+Meaning of often used variable names:
+	- i, j = contor variables used in the for() expression
+	- main = the main load balancer
+	- hash_ring = the hash ring used for the equal distribution of values in the servers
+	- servers[] = the array of servers
+	- ht = the hashtable inside of one of the servers
+	- curr = the node which is used for going through the hashtable's buckets (which are simple linked lists)
+	- curr_key / curr_value = the key/value of the current
+	
+Explaining the code:
+
+💠️load_balancer
+
+	- init_load_balancer() :
+		In this function I initialized and allocated memory for all the fields of the main load balancer. I initialized memory for the servers, and then initialized them all to NULL so I could have a clear representation of which servers I used and which I didn't.
+		I also allocated memory for the main load balancer and its hash ring. In the end, I initialized the number of servers used and the number of servers on the hash ring to zero.
+	
+	-init_curr_key() and init_curr_value() :
+		This procedure is used to allocate new memory for the key and value names. I did this because when a new value-key pair is added to another server, it has no link to the pair from the old server. Valgrind leaks may occur otherwise, because when the pair is freed it also frees the value and key from the server we would want to keep.
+	
+	- loader_store() :
+		This function searches through the hash ring to find the position of the wanted server. After that, it stores the value-key pair on its hashtable.
+		
+	- loader_add_server() :
+		Firstly, in this function I allocate memory for the new added server. After that I calculate the 3 labels and place them on the hash ring with the help of the hash_ring_add_server() function.
+		In the end I recalculate the labels and change the places of some values and keys if needed, calling the add_new_server() function.
+	- hash_ring_add_Server() :
+		This procedure finds the place in the hash ring to place a new label and then does so.
+	- add_new_server() :
+		This function recieves the label and the main load balancer as parametres.
+		It finds the label in the hash ring, and initializes server1 with the server assigned to it. After that, it calculates and initializes server2 with the consecutive server in the hash ring.
+		If the two are not pointing to the same server, than server2's values are being placed again in the load balancer. If the values are not stored on the same server, than they are deleted, but remain in the new server.
+		
+	- loader_remove_server():
+		This function removes the server from the load balancer. It firstly searches for the labels in the hash ring and deleting them from the array calling the hash_ring_remove_server() function.
+		Then, all the value-key pairs from the deleted server are placed again in the load balancer calling the delete_server() function.
+		
+	- free_load_balancer():
+		Frees all the memory allocated for the fields in the main load balancer.
+
+
+💠️server
+	
+	- init_server_memory() :
+		It allocates memory for the fields in the server_memory structure.
+	
+	- server_store() :
+		It calls the ht_put() function to place a value-key pair in the server's hashtable.
+		
+	- server_remove() :
+		Removes and frees the space allocated for the given key from the server's hashtable calling the ht_remove() function.
+		
+	- server_retrieve() :
+		Calls the ht_get() function to return the value's string from the hashtable.
+		
+	- free_server_memory() :
+		Frees the memory of the hashtable and then frees the memory for the server

@@ -12,7 +12,6 @@ typedef struct server_memory server_memory;
 
 struct server_memory {
 	hashtable_t *ht;
-    unsigned int num_data;
 };
 
 server_memory* init_server_memory();

@@ -35,25 +35,15 @@ ht_has_key(hashtable_t *ht, void *key);
 void
 ht_remove_entry(hashtable_t *ht, void *key);
 
-unsigned int
-ht_get_size(hashtable_t *ht);
-
-unsigned int
-ht_get_hmax(hashtable_t *ht);
-
 void
 ht_free(hashtable_t *ht);
 
-/*
-Comparing keys function:
-*/
+// Comparing keys function:
 int
 compare_function_strings(void *a, void *b);
 
-/*
-Hashing functions:
-*/
+// Hashing function:
 unsigned int
 hash_function_string(void *a);
 
-#endif /* HASHTABLE_H_ */
+#endif  // HASHTABLE_H_

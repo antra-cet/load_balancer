@@ -9,19 +9,17 @@ typedef struct load_balancer load_balancer;
 
 load_balancer* init_load_balancer();
 
-/*
-Function which moves the values from server2 to server1
-*/
-void readjust_values_server1(unsigned int hash0, server_memory *server1,
-                     unsigned int hash1, server_memory *server2);
-void readjust_values_server2(server_memory *server1, server_memory *server2);
+/* The two functions allocate memory for the
+value and key of the current node */
+char *init_curr_key(ll_node_t *curr);
+char *init_curr_value(ll_node_t *curr);
+
 /* This function adds a new server in the hash ring and
 readjust the values stored on the servers */
 void add_new_server(load_balancer *main, long long label);
 /* This function deletes a server in the hash ring and
 readjust the values stored on the servers */
 void delete_server(load_balancer *main, int server_id);
-
 
 void free_load_balancer(load_balancer* main);
 
@@ -72,6 +70,7 @@ void loader_add_server(load_balancer* main, int server_id);
  * The load balancer will distribute ALL objects stored on the
  * removed server and will delete ALL replicas from the hash ring.
  */
+void hash_ring_remove_server(load_balancer *main, long long label);
 void loader_remove_server(load_balancer* main, int server_id);
 
 

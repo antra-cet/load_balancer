@@ -5,10 +5,11 @@
 #include "server.h"
 
 server_memory* init_server_memory() {
+	// Allocating memory for the server
 	server_memory *server = malloc(sizeof(server_memory));
 	DIE(server == NULL, "Unable to allocate memory for the server!\n");
 
-	server->num_data = 0;
+	// Initializing memory for the hashtable
 	server->ht = ht_create(NUM_BUCKETS,
 						   hash_function_string, compare_function_strings);
 
@@ -17,12 +18,10 @@ server_memory* init_server_memory() {
 
 void server_store(server_memory* server, char* key, char* value) {
 	ht_put(server->ht, key, strlen(key) + 1, value, strlen(value) + 1);
-	server->num_data++;
 }
 
 void server_remove(server_memory* server, char* key) {
 	ht_remove_entry(server->ht, key);
-	server->num_data--;
 }
 
 char* server_retrieve(server_memory* server, char* key) {

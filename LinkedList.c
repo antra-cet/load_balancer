@@ -6,11 +6,9 @@
 #include "LinkedList.h"
 #include "utils.h"
 
-/*
-Function which initializez the linked list,
+/* Function which initializez the linked list,
 allocating the necessary memory and initializing
-the fields of the linked_list_t structure.
-*/
+the fields of the linked_list_t structure. */
 linked_list_t*
 ll_create(unsigned int data_size)
 {
@@ -25,13 +23,11 @@ ll_create(unsigned int data_size)
     return list;
 }
 
-/*
-This function creates a new node and adds it on the n-th position
+/* This function creates a new node and adds it on the n-th position
 in the given linked list; the positions start from the 0 index.
 If the given n is smaller than 0 (n < 0), than an error occurs, but
 if n is larger that the number of nodes in the linked list, than
-the data is stored on the last position of the list.
-*/
+the data is stored on the last position of the list. */
 void
 ll_add_nth_node(linked_list_t* list, unsigned int n, const void* new_data)
 {
@@ -81,11 +77,9 @@ ll_add_nth_node(linked_list_t* list, unsigned int n, const void* new_data)
     list->size++;
 }
 
-/*
-Function which returns the n-th entry from the given list.
+/* Function which returns the n-th entry from the given list.
 The same conditions regarding the n index as in the
-ll_add_nth_node() function.
- */
+ll_add_nth_node() function. */
 ll_node_t *
 ll_remove_nth_node(linked_list_t* list, unsigned int n)
 {
@@ -127,24 +121,8 @@ ll_remove_nth_node(linked_list_t* list, unsigned int n)
     return free_pointer;
 }
 
-/*
-Returns the number of nodes in the list
-*/
-unsigned int
-ll_get_size(linked_list_t* list)
-{
-    if (list == NULL) {
-        printf("No list initialized!\n");
-        return -1;
-    }
-
-    return list->size;
-}
-
-/*
-Function which frees all the nodes in the list, as
-well as the list itself in the end.
-*/
+/* Function which frees all the nodes in the list, as
+well as the list itself in the end. */
 void
 ll_free(linked_list_t** pp_list)
 {
@@ -162,61 +140,4 @@ ll_free(linked_list_t** pp_list)
     }
 
     free(*pp_list);
-}
-
-/*
-Function which prints the values of the
-nodes in the list, as integers.
-*/
-void
-ll_print_int(linked_list_t* list)
-{
-    ll_node_t *element;
-    unsigned int i;
-
-    if (list == NULL) {
-        printf("No list initialized!\n");
-        return;
-    }
-
-    element = malloc(list->data_size);
-
-    DIE(element == NULL,
-        "Unable to allocate memory for the node used for printing integers!\n");
-
-    element = list->head;
-
-    for (i = 0; i < list->size; i++) {
-        printf("%d ", *((int *)element->data));
-        element = element->next;
-    }
-
-    printf("\n");
-}
-
-/*
-Function which prints the values of the
-nodes in the list, as strings.
-*/
-void
-ll_print_string(linked_list_t* list) {
-    ll_node_t *element;
-    unsigned int i;
-
-    if (list == NULL) {
-        printf("No list initialized!\n");
-        return;
-    }
-
-    DIE(element == NULL,
-        "Unable to allocate memory for the node used for printing strings!\n");
-
-    element = list->head;
-
-    for (i = 0; i < list->size; i++) {
-        printf("%s ", (char *)element->data);
-        element = element->next;
-    }
-
-    printf("\n");
 }
